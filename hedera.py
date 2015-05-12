@@ -23,8 +23,6 @@ from argparse import ArgumentParser
 
 import sys
 import os
-from util.monitor import monitor_qlen
-from util.helper import stdev
 
 
 def cprint(s, color, cr=True):
@@ -102,11 +100,11 @@ parser.add_argument('--dir', '-d',
 # Expt parameters
 args = parser.parse_args()
 
-if not k % 2 == 0:
+if not args.k % 2 == 0:
     raise ValueError("k must be an even integer")
 
-CUSTOM_IPERF_PATH = args.iperf
-assert(os.path.exists(CUSTOM_IPERF_PATH))
+# CUSTOM_IPERF_PATH = args.iperf
+# assert(os.path.exists(CUSTOM_IPERF_PATH))
 
 if not os.path.exists(args.dir):
     os.makedirs(args.dir)
