@@ -102,6 +102,9 @@ parser.add_argument('--dir', '-d',
 # Expt parameters
 args = parser.parse_args()
 
+if not k % 2 == 0:
+    raise ValueError("k must be an even integer")
+
 CUSTOM_IPERF_PATH = args.iperf
 assert(os.path.exists(CUSTOM_IPERF_PATH))
 
@@ -111,23 +114,69 @@ if not os.path.exists(args.dir):
 lg.setLogLevel('info')
 
 
-# Topology to be instantiated in Mininet
 class FatTreeTopo(Topo):
     "Fat Tree Topology"
 
-    def build(self):
-        # TODO: Fill in the following function to Create the experiment
-        # topology
-        pass
+    # Example names for k=4
+    def build(self, k, link_bw, delay):
+
+        # Set up the (k/2)^2 core switches, c0 : c3
+        core_switches = {}
+        for i in xrange((k / 2) ** 2):
+            name = 'c' + str(i)
+            core_switches[name] = self.addSwitch(name)
+
+        # Set up the k pods, each of k switches
+        for pod in xrange(k):
+
+            # First k/2 are aggregation switches, a0 : a1
+            agg_switches = {}
+            for agg in xrange(k / 2):
+                name = 'a' + str(pod * (k / 2) + agg)
+                agg_switch = self.addSwitch(name)
+                agg_switches[name] = agg_switch
+
+                # Each aggregation switch connects to k/2 core switches
+                for c in xrange(k / 2):
+                    core_switch = core_switches['c' + str(agg * (k / 2) + c)]
+                    self.addLink(agg_switch, core_switch, bw=link_bw, delay=delay)
+
+            # Second k/2 are edge switches, e0 : e1
+            edge_switches = {}
+            for edge in xrange(k / 2):
+                name = 'e' + str(pod * (k / 2) + edge)
+                edge_switch = self.addSwitch(name)
+                edge_switches[name] = edge_switch
+
+                # Each edge switch connects to k/2 agg switches (all in pod)
+                for agg in xrange(k / 2):
+                    agg_switch = agg_switches['a' + str(pod * (k / 2) + agg)]
+                    self.addLink(edge_switch, agg_switch, bw=link_bw, delay=delay)
+
+                # Each edge switch connects to k/2 end hosts
+                for h in xrange(k / 2):
+                    hostname = 'h' + str(pod * k + edge * (k / 2) + h)
+                    host = self.addHost(hostname)
+                    self.addLink(edge_switch, host, bw=link_bw, delay=delay)
 
 
 def main(args):
-    pass
+    print 'Running Hedera testbed experiment with k=%d' % args.k
+
+    start = time()
+    # Reset to known state
+    topo = FatTreeTopo(k=args.k, link_bw=args.link_bw, delay=args.delay)
+    net = Mininet(topo=topo, host=CPULimitedHost, link=TCLink)
+    net.start()
+    dumpNodeConnections(net.hosts)
+    net.pingAll()
+
+    print 'All done in %fs!' % (time() - start)
 
 
 if __name__ == '__main__':
     try:
-        main()
+        main(args)
     except:
         print "-"*80
         print "Caught exception.  Cleaning up..."
