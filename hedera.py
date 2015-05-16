@@ -167,7 +167,9 @@ def main(args):
     net = Mininet(topo=topo, host=CPULimitedHost, link=TCLink)
     net.start()
     dumpNodeConnections(net.hosts)
+    CLI(net)
     net.pingAll()
+    net.stop()
 
     print 'All done in %fs!' % (time() - start)
 
