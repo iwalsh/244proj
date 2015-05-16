@@ -14,6 +14,8 @@ from mininet.log import lg
 from mininet.util import dumpNodeConnections
 from mininet.cli import CLI
 
+from fattree import FatTree
+
 import subprocess
 from subprocess import Popen, PIPE
 from time import sleep, time
@@ -112,58 +114,12 @@ if not os.path.exists(args.dir):
 lg.setLogLevel('info')
 
 
-class FatTreeTopo(Topo):
-    "Fat Tree Topology"
-
-    # Example names for k=4
-    def build(self, k, link_bw, delay):
-
-        # Set up the (k/2)^2 core switches, c0 : c3
-        core_switches = {}
-        for i in xrange((k / 2) ** 2):
-            name = 'c' + str(i)
-            core_switches[name] = self.addSwitch(name)
-
-        # Set up the k pods, each of k switches
-        for pod in xrange(k):
-
-            # First k/2 are aggregation switches, a0 : a1
-            agg_switches = {}
-            for agg in xrange(k / 2):
-                name = 'a' + str(pod * (k / 2) + agg)
-                agg_switch = self.addSwitch(name)
-                agg_switches[name] = agg_switch
-
-                # Each aggregation switch connects to k/2 core switches
-                for c in xrange(k / 2):
-                    core_switch = core_switches['c' + str(agg * (k / 2) + c)]
-                    self.addLink(agg_switch, core_switch, bw=link_bw, delay=delay)
-
-            # Second k/2 are edge switches, e0 : e1
-            edge_switches = {}
-            for edge in xrange(k / 2):
-                name = 'e' + str(pod * (k / 2) + edge)
-                edge_switch = self.addSwitch(name)
-                edge_switches[name] = edge_switch
-
-                # Each edge switch connects to k/2 agg switches (all in pod)
-                for agg in xrange(k / 2):
-                    agg_switch = agg_switches['a' + str(pod * (k / 2) + agg)]
-                    self.addLink(edge_switch, agg_switch, bw=link_bw, delay=delay)
-
-                # Each edge switch connects to k/2 end hosts
-                for h in xrange(k / 2):
-                    hostname = 'h' + str(pod * k + edge * (k / 2) + h)
-                    host = self.addHost(hostname)
-                    self.addLink(edge_switch, host, bw=link_bw, delay=delay)
-
-
 def main(args):
     print 'Running Hedera testbed experiment with k=%d' % args.k
 
     start = time()
     # Reset to known state
-    topo = FatTreeTopo(k=args.k, link_bw=args.link_bw, delay=args.delay)
+    topo = FatTree(k=args.k, link_bw=args.link_bw, delay=args.delay)
     net = Mininet(topo=topo, host=CPULimitedHost, link=TCLink)
     net.start()
     dumpNodeConnections(net.hosts)
