@@ -1,0 +1,139 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage,enumitem,amsmath,amssymb,graphicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{sectsty}
+\usepackage{multicol}
+\usepackage{geometry}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{wrapfig}
+\usepackage[outdir=./]{epstopdf}
+\usepackage{float}
+
+\sectionfont{\fontsize{12}{11}\selectfont}
+\geometry{rmargin=0.4in, lmargin=0.4in, tmargin=0.75in, bmargin=0.75in}
+\setlength{\columnsep}{0.75cm} 
+
+
+\begin{document}
+
+% Header
+\begin{center}
+{\Large Reproducing Network Research: Hedera Multipath Routing} \\
+{\large Intermediate Report for CS 244, Spring 2015}\\ 
+{Anh Truong (anhlt92@stanford.edu) and Ian Walsh (iwalsh@stanford.edu)}
+\end{center}
+
+% Second, your Intermediate Report is due next Tuesday, May 19, a week from now. Submission instructions % are on the website. Again, we are looking for three things:
+%
+% Should have the structure of the final report
+% Complete introduction written
+% Status of the project.
+%
+% To be more concrete, you should answer the following questions: 
+%
+% 1. Goals: What problem was the original paper trying to solve?
+% 2. Motivation: Why is the problem important/interesting?
+% 3. Results: What did the original authors find?
+% 4. Subset Goal: What subset of results did you choose to reproduce?
+% 5. Subset Motivation: Why that particular choice?
+% 
+% 6. Progress so far
+%
+% 7. Plans for the next two weeks
+
+\abstract{We are reproducing the physical testbed results of Hedera, a system for routing large flows in datacenter networks with many available equal-cost paths between end hosts. Specifically, we are implementing the Equal Cost Multipath (ECMP), Global First-Fit, and Simulated Annealing algorithms for flow placement, and we expect to see Simulated Annealing significantly outperform the other approaches on a variety of traffic patterns, as quantified by the bisection bandwidth.}
+
+\begin{multicols}{2}
+
+% Intro
+\section{Introduction \& Motivation}
+% TODO: cite VL2 here?
+% TODO: cite fat-tree
+The explosive growth of cloud services in recent years has been been facilitated by the construction of large, privately-owned datacenters each housing many thousands of servers. The networks connecting these servers together represent unique challenges for routing and congestion-avoidance protocols, but also unique opportunities: technologies and solutions developed for datacenter networks can be implemented locally without requiring Internet-wide deployment.
+
+% TODO: figure of fat-tree topology?
+A defining characteristic of datacenter networks is routing redundancy: between any pair of source and destination hosts, there exist many equal-cost paths along which flows could be routed. The key to achieving good performance and network utilization is to spread the traffic evenly among all available links: collisions occur when large flows are each routed through the same link, reducing throughput even while unused bandwidth is available elsewhere in the network. Good multipath routing protocols, then, which spread traffic uniformly and achieve high utilization, are essential for datacenter performance.
+
+% TODO: cite ECMP?
+A widely-used multipath routing technique goes by the name of Equal-Cost Multipath Routing (ECMP). In it, flows are hashed on a 10-tuple of header fields, and the hash modulo $N $is used to assign a flow to one of $N$ available routes from \textit{src} to \textit{dst}. While conceptually simple and easy to implement, ECMP has significant drawbacks: it disregards the \textit{size} and \textit{duration} of flows, and fails to adapt to changing traffic patterns and link utilizations over time. Thus in large networks with many flows, performance is limited by routing collisions between large, long-lived flows, reducing the achievable bisection bandwidth.
+
+% TODO: cite OpenFlow
+In this work we attempt to reproduce the results of Hedera \cite{Hedera}, a system that attempts to improve upon ECMP by using a central scheduler with a dynamic view of the network state, and updating routing tables in real time using OpenFlow. Section 2 presents an overview of Hedera, the algorithms it uses for multipath routing, and the authors' experimental results on a physical testbed of 16 hosts. Section 3 describes our current progress, and Section 4 concludes with our plans for future work.
+
+% Hedera background
+\section{The Hedera System}
+Nam \cite{Hedera} maximus tellus vel porttitor condimentum. Quisque pellentesque molestie ante vel efficitur. Integer justo arcu, tristique et enim sit amet, iaculis malesuada massa. Nulla eget condimentum ipsum. Duis fermentum elit sed rutrum porttitor. Ut sit amet sagittis dolor, eget posuere sapien. Donec ut aliquam enim. Maecenas aliquet a nibh at eleifend. Praesent maximus finibus dui, vel vestibulum magna lobortis quis. Fusce gravida quam in ipsum posuere, at iaculis enim finibus. Pellentesque convallis hendrerit nunc, eu fermentum augue mattis at. Duis at velit pharetra, hendrerit velit a, facilisis leo. Donec sit amet nunc vel ex tristique efficitur. Donec vulputate rhoncus elit eget tempor. Vestibulum ultrices sapien finibus libero imperdiet, finibus laoreet risus laoreet. Sed sit amet urna eu purus scelerisque fermentum.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel convallis sapien. Duis dictum consectetur nunc, ut hendrerit orci posuere vitae. Sed vehicula elementum dui ac ullamcorper. Morbi justo nibh, laoreet nec lacinia sed, ultrices ut nibh. Nullam bibendum, urna eget molestie pellentesque, enim turpis viverra enim, id vulputate enim purus vel sapien. Nam tempor luctus purus, vitae finibus erat ornare eget. Nulla dapibus augue quis lectus fermentum blandit. Mauris diam mi, sollicitudin et ullamcorper vel, accumsan vel turpis. Sed ultricies quis est non fermentum. Quisque at efficitur nunc. Donec congue mattis nisi vel consequat.
+
+Cras accumsan posuere erat, et pretium nisi laoreet vel. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Duis sit amet elit eu nulla suscipit tempus vel nec neque. Etiam mattis risus in lacus interdum, a pharetra felis vestibulum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Praesent placerat lectus nec risus auctor, ac placerat mi posuere. Nunc dictum eros a justo iaculis mollis. Sed accumsan aliquet orci a posuere. Praesent eu elit fringilla nisi tempus venenatis vitae a ligula. Duis commodo erat et suscipit consequat.
+
+% Algorithms
+\subsection{Algorithms}
+Blargh
+
+% Original results
+\subsection{Original Results}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel convallis sapien. Duis dictum consectetur nunc, ut hendrerit orci posuere vitae. Sed vehicula elementum dui ac ullamcorper. Morbi justo nibh, laoreet nec lacinia sed, ultrices ut nibh. Nullam bibendum, urna eget molestie pellentesque, enim turpis viverra enim, id vulputate enim purus vel sapien. Nam tempor luctus purus, vitae finibus erat ornare eget. Nulla dapibus augue quis lectus fermentum blandit. Mauris diam mi, sollicitudin et ullamcorper vel, accumsan vel turpis. Sed ultricies quis est non fermentum. Quisque at efficitur nunc. Donec congue mattis nisi vel consequat.
+
+% Progress
+\section{Current Progress}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel convallis sapien. Duis dictum consectetur nunc, ut hendrerit orci posuere vitae. Sed vehicula elementum dui ac ullamcorper. Morbi justo nibh, laoreet nec lacinia sed, ultrices ut nibh. Nullam bibendum, urna eget molestie pellentesque, enim turpis viverra enim, id vulputate enim purus vel sapien. Nam tempor luctus purus, vitae finibus erat ornare eget. Nulla dapibus augue quis lectus fermentum blandit. Mauris diam mi, sollicitudin et ullamcorper vel, accumsan vel turpis. Sed ultricies quis est non fermentum. Quisque at efficitur nunc. Donec congue mattis nisi vel consequat.
+
+%\begin{figure}[H]
+	%\includegraphics[width=1\linewidth]{./LOF_results.png}
+%\end{figure}
+
+
+% Future
+\section{Future Plans}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel convallis sapien. Duis dictum consectetur nunc, ut hendrerit orci posuere vitae. Sed vehicula elementum dui ac ullamcorper. Morbi justo nibh, laoreet nec lacinia sed, ultrices ut nibh. Nullam bibendum, urna eget molestie pellentesque, enim turpis viverra enim, id vulputate enim purus vel sapien. Nam tempor luctus purus, vitae finibus erat ornare eget. Nulla dapibus augue quis lectus fermentum blandit. Mauris diam mi, sollicitudin et ullamcorper vel, accumsan vel turpis. Sed ultricies quis est non fermentum. Quisque at efficitur nunc. Donec congue mattis nisi vel consequat.
+
+\end{multicols}
+
+\scriptsize{
+\nocite{*}
+\bibliographystyle{amsplain}
+\bibliography{./bibliography.bib}
+
+}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
