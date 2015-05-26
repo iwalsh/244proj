@@ -69,7 +69,7 @@ def traffic_stride(i):
     """
     traffic = {}
     for x in range(N_HOSTS):
-        traffic[x] = [(x + i) % N_HOSTS]
+        traffic[str(x)] = [(x + i) % N_HOSTS]
     return traffic
 
 
