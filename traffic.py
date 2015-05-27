@@ -86,26 +86,30 @@ def traffic_staggered(edge_p, pod_p):
     A host sends to another host in the same edge switch with probability
     edge_p, and to its same pod with probability pod_p, and to the rest of
     the network with probability 1 - edge_p - pod_p.
+
+    ^ Somewhat ambiguously worded, but every host sends to exactly 1 other
+    host: not 0, and not 3.
     """
     traffic = {}
     for x in range(N_HOSTS):
         traffic[str(x)] = []
 
-        # Send to host on same edge switch w/ prob edge_p
-        if random.random() <= edge_p:
+        rand = random.random()
+
+        if rand <= edge_p:
+            # Send to host on same edge switch w/ prob edge_p
             if x % 2 == 0:
                 dst = x + 1
             else:
                 dst = x - 1
             traffic[str(x)].append(dst)
-
-        # Send to host in same pod with probability pod_p
-        if random.random() <= pod_p:
+        elif rand <= (edge_p + pod_p):
+            # Send to host in same pod with probability pod_p
             traffic[str(x)].append(other_host_in_pod(x))
-
-        # Send to non-pod host with prob (1 - edge_p - pod_p)
-        if random.random() <= (1.0 - edge_p - pod_p):
+        else:
+            # Send to non-pod host with prob (1 - edge_p - pod_p)
             traffic[str(x)].append(other_host_outside_pod(x))
+
     return traffic
 
 
