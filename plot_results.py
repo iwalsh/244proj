@@ -18,13 +18,24 @@ else:
 import matplotlib.pyplot as plt
 
 from argparse import ArgumentParser
+from math import ceil
 
 RESULTS_DIR = 'results/'
 
+# Keys in the results/*.json dictionaries
 ECMP_MEAN = 'ecmp_mean_gbps'
 ECMP_STDDEV = 'ecmp_stddev_gbps'
 GFF_MEAN = 'gff_mean_gbps'
 GFF_STDDEV = 'gff_stddev_gbps'
+
+# Plot params
+TRAFFICS_PER_ROW = 6
+LEGEND_BEST = 0
+LEGEND_UPPER_LEFT = 2
+LEGEND_CENTER_BOTTOM = 8
+BAR_WIDTH = 0.35
+OPACITY = 1.0
+ERROR_CONFIG = {'ecolor': '0.3'}
 
 parser = ArgumentParser(description='Plotting Hedera results')
 parser.add_argument('outfile', type=str, help='Where to save the plot')
@@ -55,7 +66,7 @@ def extract_means(data):
     means_ecmp = []
     means_gff = []
 
-    for label in data:
+    for label in sorted(data):
         if ECMP_MEAN in data[label]:
             means_ecmp.append(data[label][ECMP_MEAN])
         else:
@@ -76,7 +87,7 @@ def extract_stddevs(data):
     stddevs_ecmp = []
     stddevs_gff = []
 
-    for label in data:
+    for label in sorted(data):
         if ECMP_STDDEV in data[label]:
             stddevs_ecmp.append(data[label][ECMP_STDDEV])
         else:
@@ -91,43 +102,59 @@ def extract_stddevs(data):
 
 
 def plot(data):
-    n_groups = len(data.keys())  # 1 group per traffic pattern
-
     (means_ecmp, means_gff) = extract_means(data)
     (stddevs_ecmp, stddevs_gff) = extract_stddevs(data)
-    traffics = data.keys()
+    traffics = sorted(data.keys())
 
-    fig, ax = plt.subplots()
+    n_rows = int(ceil(float(len(traffics)) / TRAFFICS_PER_ROW))
 
-    index = range(n_groups)
-    bar_width = 0.35
+    # Plot TRAFFICS_PER_ROW results on each row
+    for r in xrange(n_rows):
+        lower = r * TRAFFICS_PER_ROW
+        upper = r * TRAFFICS_PER_ROW + TRAFFICS_PER_ROW
 
-    opacity = 0.4
-    error_config = {'ecolor': '0.3'}
+        # Slice data for this row
+        row_ecmp_avgs = means_ecmp[lower:upper]
+        row_ecmp_devs = stddevs_ecmp[lower:upper]
+        row_gff_avgs = means_gff[lower:upper]
+        row_gff_devs = stddevs_gff[lower:upper]
+        row_traffics = traffics[lower:upper]
 
-    rects1 = plt.bar(index, means_ecmp, bar_width,
-                     alpha=opacity,
-                     color='b',
-                     yerr=stddevs_ecmp,
-                     error_kw=error_config,
-                     label='ECMP')
+        index = range(len(row_ecmp_avgs))
+        index2 = map(lambda x: x + BAR_WIDTH, index)
 
-    index2 = map(lambda x: x + bar_width, index)
-    rects2 = plt.bar(index2, means_gff, bar_width,
-                     alpha=opacity,
-                     color='r',
-                     yerr=stddevs_gff,
-                     error_kw=error_config,
-                     label='Global first-fit')
+        plt.subplot(n_rows, 1, r + 1)
 
-    plt.xlabel('Traffic pattern')
-    plt.ylabel('Total throughput')
-    plt.title('Comparison of scheduling performance')
-    plt.xticks(index2, traffics)
-    plt.legend()
+        # ECMP bars
+        plt.bar(index, row_ecmp_avgs, BAR_WIDTH,
+                alpha=OPACITY,
+                color='r',
+                yerr=row_ecmp_devs,
+                error_kw=ERROR_CONFIG,
+                label='ECMP')
+
+        # GFF bars
+        plt.bar(index2, row_gff_avgs, BAR_WIDTH,
+                alpha=OPACITY,
+                color='g',
+                yerr=row_gff_devs,
+                error_kw=ERROR_CONFIG,
+                label='Global First-Fit')
+
+        plt.xticks(index2, row_traffics)
+
+        if r == 0:
+            plt.title('Comparison of scheduling performance')
+        elif r == n_rows - 1:
+            plt.xlabel('Traffic pattern')
+
+        # TODO: Can I make the ylabels smaller or wrapped? This is ugly
+        if r == 1:
+            plt.ylabel('Total throughput (Gbps)')
+
+    plt.legend(loc=LEGEND_BEST)
 
     plt.tight_layout()
-    # plt.show()
 
     if os.path.exists(args.outfile):
         os.remove(args.outfile)

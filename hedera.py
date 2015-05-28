@@ -237,7 +237,7 @@ def main(args):
 
     save_results(mean_gbps, stddev_gbps)
 
-    CLI(net)
+    # CLI(net)
 
     # Shut down iperf processes
     os.system('killall -9 ' + IPERF_PATH)
