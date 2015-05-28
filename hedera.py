@@ -157,6 +157,10 @@ def sample_rxbytes(net, rxbytes):
 
 
 def aggregate_statistics(rxbytes, sample_durations):
+    """
+    Return the average throughput and variance summed over each host, in
+    bytes/sec
+    """
     throughputs = bytes_to_throughputs(rxbytes, sample_durations)
 
     agg_throughput = 0.0
@@ -230,10 +234,12 @@ def main(args):
 
     (agg_mean, agg_var) = aggregate_statistics(rxbytes, sample_durations)
     agg_stddev = sqrt(agg_var)
-    mean_gbps = agg_mean / (2 ** 30)
-    stddev_gbps = agg_stddev / (2 ** 30)
-    print 'Total average throughput: %f (%f Gbps)' % (agg_mean, mean_gbps)
-    print 'Total stddev=%f (%f Gbps)' % (agg_stddev, stddev_gbps)
+    mean_gbps = agg_mean / (2 ** 30) * 8
+    stddev_gbps = agg_stddev / (2 ** 30) * 8
+    print 'Total average throughput: %f bytes/sec (%f Gbps)' %\
+          (agg_mean, mean_gbps)
+    print 'Standard deviation: %f bytes/sec (%f Gbps)' %\
+          (agg_stddev, stddev_gbps)
 
     save_results(mean_gbps, stddev_gbps)
 
