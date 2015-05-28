@@ -214,6 +214,8 @@ def main(args):
     net.start()
     dumpNodeConnections(net.hosts)
 
+    # CLI(net)
+
     print 'Generating the traffic pattern in "%s"...' % args.traffic
     start_traffic(net)
 
