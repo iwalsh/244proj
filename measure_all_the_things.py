@@ -22,32 +22,32 @@ TRAFFIC_DIR = 'traffic/'
 RESULTS_DIR = 'all_the_things/'
 
 
-def run_ecmp_controller():
+def run_ecmp_controller(stdout_fd):
     """
     Run the POX controller using ECMP flow scheduling. This runs forever, so
     it must be killed by the parent process.
     """
     cmd = '~/pox/pox.py riplpox.riplpox --topo=ft,4 --routing=random --mode=reactive'
-    subprocess.call(cmd, shell=True)
+    subprocess.call(cmd, stdout=stdout_fd, stderr=subprocess.STDOUT, shell=True)
 
 
-def run_gff_controller():
+def run_gff_controller(stdout_fd):
     """
     Run the Hedera controller using Global First-Fit flow scheduling. Runs
     forever, so the parent should kill it when hedera.py is done.
     """
     cmd = '~/pox/pox.py controllers.hederaController --topo=ft,4'
-    subprocess.call(cmd, shell=True)
+    subprocess.call(cmd, stdout=stdout_fd, stderr=subprocess.STDOUT, shell=True)
 
 
-def run_measurements(label, traffic_file):
+def run_measurements(label, traffic_file, stdout_fd):
     """
     Run the hedera.py script to start Mininet and take one measurement of
     aggregate throughput for a single traffic pattern and controller. This
     completes in ~1 minute, so the caller blocks until it's done.
     """
     cmd = 'sudo python hedera.py %s %s' % (label, traffic_file)
-    subprocess.call(cmd, shell=True)
+    subprocess.call(cmd, stdout=stdout_fd, shell=True)
 
 
 def main():
@@ -59,16 +59,18 @@ def main():
         if not (os.path.isfile(filepath) and filepath.endswith('.json')):
             continue
 
-        # ECMP measurement
-        print '\nTaking the ECMP measurement for %s...' % filepath
-        print '=====================================\n'
-        start = time()
         with open('/dev/null', 'w') as devnull:
-            controller = Process(target=run_ecmp_controller, stdout=devnull)
+            # ECMP measurement
+            print '\nTaking the ECMP measurement for %s...' % filepath
+            print '=====================================\n'
+            start = time()
+
+            controller = Process(target=run_ecmp_controller, args=(devnull,))
             controller.start()
             sleep(5)
 
-            mininet = Process(target=run_measurements, args=('ecmp', filepath))
+            mininet = Process(target=run_measurements,
+                              args=('ecmp', filepath, devnull))
             mininet.start()
             mininet.join()
 
@@ -76,16 +78,17 @@ def main():
             print '\nFinished ECMP measurement in %02fs!' % (time() - start)
             sleep(5)
 
-        # GFF measurement
-        print '\nTaking the GFF measurement for %s...' % filepath
-        print '====================================\n'
-        start = time()
-        with open('/dev/null', 'w') as devnull:
-            controller = Process(target=run_gff_controller, stdout=devnull)
+            # GFF measurement
+            print '\nTaking the GFF measurement for %s...' % filepath
+            print '====================================\n'
+            start = time()
+
+            controller = Process(target=run_gff_controller, args=(devnull,))
             controller.start()
             sleep(5)
 
-            mininet = Process(target=run_measurements, args=('gff', filepath))
+            mininet = Process(target=run_measurements,
+                              args=('gff', filepath, None))
             mininet.start()
             mininet.join()
 
