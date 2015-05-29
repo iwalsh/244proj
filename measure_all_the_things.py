@@ -29,8 +29,8 @@ def run_ecmp_controller(stdout_fd):
     Run the POX controller using ECMP flow scheduling. This runs forever, so
     it must be killed by the parent process.
     """
-    cmd = '~/pox/pox.py controllers.riplpox --topo=ft,4 --routing=hashed --mode=reactive'
-    subprocess.call(cmd, stdout=stdout_fd, stderr=subprocess.STDOUT, shell=True)
+    cmd = '/bin/sh -c ~/pox/pox.py controllers.riplpox --topo=ft,4 --routing=hashed --mode=reactive'
+    return subprocess.Popen(cmd.split())
 
 
 def run_gff_controller(stdout_fd):
@@ -38,8 +38,8 @@ def run_gff_controller(stdout_fd):
     Run the Hedera controller using Global First-Fit flow scheduling. Runs
     forever, so the parent should kill it when hedera.py is done.
     """
-    cmd = '~/pox/pox.py controllers.hederaController --topo=ft,4'
-    subprocess.call(cmd, stdout=stdout_fd, stderr=subprocess.STDOUT, shell=True)
+    cmd = '/bin/sh -c ~/pox/pox.py controllers.hederaController --topo=ft,4'
+    return subprocess.Popen(cmd.split())
 
 
 def run_measurements(label, traffic_file):
@@ -49,7 +49,7 @@ def run_measurements(label, traffic_file):
     completes in ~1 minute, so the caller blocks until it's done.
     """
     cmd = 'sudo python hedera.py %s %s' % (label, traffic_file)
-    subprocess.call(cmd, shell=True)
+    return subprocess.Popen(cmd.split())
 
 
 def main():
@@ -67,15 +67,13 @@ def main():
             print '=====================================\n'
             start = time()
 
-            controller = Process(target=run_ecmp_controller, args=(devnull,))
-            controller.start()
-            sleep(5)
+            controller = run_ecmp_controller(devnull)
+            sleep(2)
 
-            mininet = Process(target=run_measurements, args=('ecmp', filepath))
-            mininet.start()
-            mininet.join()
+            mininet = run_measurements('ecmp', filepath)
+            mininet.wait()
 
-            controller.terminate()
+            controller.kill()
             print '\nFinished ECMP measurement in %02fs!' % (time() - start)
             sleep(5)
 
@@ -84,15 +82,13 @@ def main():
             print '====================================\n'
             start = time()
 
-            controller = Process(target=run_gff_controller, args=(devnull,))
-            controller.start()
-            sleep(5)
+            controller = run_gff_controller(devnull)
+            sleep(2)
 
-            mininet = Process(target=run_measurements, args=('gff', filepath))
-            mininet.start()
-            mininet.join()
+            mininet = run_measurements('gff', filepath)
+            mininet.wait()
 
-            controller.terminate()
+            controller.kill()
             print '\nFinished ECMP measurement in %02fs!' % (time() - start)
             sleep(5)
 
