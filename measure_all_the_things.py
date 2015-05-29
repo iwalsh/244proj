@@ -1,9 +1,11 @@
 # measure_all_the_things.py
 #
 # Run the Mininet simulation and measure the resulting aggregate throughput
-# for every (traffic, scheduling). This operation takes a long time: there
-# are 17 traffic pattersn and 2 scheduling algorithms, and each run takes
-# ~1 minute, so the full process takes 30-45 minutes!
+# for every (traffic, scheduling).
+#
+# This operation can take a long time: there are 17 traffic patters and 2
+# scheduling algorithms, and each of the 34 runs takes from ~30 seconds
+# (on a fast EC2 instance) to ~2 minutes (on a slow laptop VM).
 #
 # Usage:
 #     $ cd ~/244proj/
@@ -40,14 +42,14 @@ def run_gff_controller(stdout_fd):
     subprocess.call(cmd, stdout=stdout_fd, stderr=subprocess.STDOUT, shell=True)
 
 
-def run_measurements(label, traffic_file, stdout_fd):
+def run_measurements(label, traffic_file):
     """
     Run the hedera.py script to start Mininet and take one measurement of
     aggregate throughput for a single traffic pattern and controller. This
     completes in ~1 minute, so the caller blocks until it's done.
     """
     cmd = 'sudo python hedera.py %s %s' % (label, traffic_file)
-    subprocess.call(cmd, stdout=stdout_fd, shell=True)
+    subprocess.call(cmd, shell=True)
 
 
 def main():
@@ -69,8 +71,7 @@ def main():
             controller.start()
             sleep(5)
 
-            mininet = Process(target=run_measurements,
-                              args=('ecmp', filepath, devnull))
+            mininet = Process(target=run_measurements, args=('ecmp', filepath))
             mininet.start()
             mininet.join()
 
@@ -87,8 +88,7 @@ def main():
             controller.start()
             sleep(5)
 
-            mininet = Process(target=run_measurements,
-                              args=('gff', filepath, None))
+            mininet = Process(target=run_measurements, args=('gff', filepath))
             mininet.start()
             mininet.join()
 
