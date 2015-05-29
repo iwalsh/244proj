@@ -1,46 +1,45 @@
-# 244proj
 Stanford CS244 Final Project
 
 This is an implementation of the Hedera controller supporting Global First Fit from http://bnrg.cs.berkeley.edu/~randy/Courses/CS294.S13/7.3.pdf. 
 
 It is built on top of Brandon Heller's Ripl library and POX controller with minor changes to both to support version consistency and Hedera functionality.
 
-To run:
+Use CS 244 Mininet VM (from website or Amazon EC2).
 
-cd ~/mininet
+(assert $HOME == '/home/mininet')
 
-git checkout -b cs244 origin/class/cs244
+1. Switch to the CS 244 version of Mininet
+    $ cd ~/mininet
+    $ git checkout -b cs244 origin/class/cs244
 
-using whatever editor you prefer, open the file  mininet/moduledeps.py
+2. Fix the module dependencies for this version
+    $ vim ~/mininet/mininet/moduledeps.py
+    (change this line: "-OVS_KMOD = 'openvswitch_mod'"
+                   to: "OVS_KMOD = 'openvswitch'")
 
-change the line, "-OVS_KMOD = 'openvswitch_mod'" to "OVS_KMOD = 'openvswitch'"
+3. Install the correct version
+    $ cd ~/mininet
+    $ sudo make install
 
-cd ../
+4. Switch to the 'dart' branch of POX
+    $ cd ~/pox
+    $ git checkout dart
+    $ git pull origin dart
 
-sudo make install
+5. Clone our project repo
+    $ cd ~
+    $ git clone https://github.com/iwalsh/244proj.git
+    $ sudo python setup.py install
 
-cd ~/pox
+6. Run it!
+    $ cd ~/244proj
+    (Terminal #1 - start the remote controller using ECMP flow scheduling)
+        $ ~/pox/pox.py riplpox.riplpox --topo=ft,4 --routing=random --mode=reactive
+    (Terminal #2 - run our measurement script on a sample traffic pattern)
+        $ sudo python hedera.py ecmp traffic/stride2.json
 
-git checkout dart
+    (Alternate Terminal #1 - start the Hedera controller using Global First-Fit flow scheduling)
 
-git pull origin dart
-
-Clone this repository,
-
-cd ~/244proj
-
-sudo python setup.py install
-
-Ian-specific instructions: (Remove this once the script is finished)
-
-To run ECMP controller: 
-
-~/pox/pox.py controllers.riplpox --topo=ft,4 --routing=hashed --mode=reactive
-
-To run Hedera controller:
-
-~/pox/pox.py controllers.hederaController --topo=ft,4
-
-
-
-
+7. Plot the results
+    $ cd ~/244proj
+    $ python plot_results myAwesomePlot.png
