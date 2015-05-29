@@ -29,7 +29,7 @@ def run_ecmp_controller(stdout_fd):
     Run the POX controller using ECMP flow scheduling. This runs forever, so
     it must be killed by the parent process.
     """
-    cmd = '~/pox/pox.py riplpox.riplpox --topo=ft,4 --routing=hashed --mode=reactive'
+    cmd = '~/pox/pox.py controllers.riplpox --topo=ft,4 --routing=hashed --mode=reactive'
     subprocess.call(cmd, stdout=stdout_fd, stderr=subprocess.STDOUT, shell=True)
 
 
