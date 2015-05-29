@@ -1,45 +1,67 @@
 Stanford CS244 Final Project
+============================
 
 This is an implementation of the Hedera controller supporting Global First Fit from http://bnrg.cs.berkeley.edu/~randy/Courses/CS294.S13/7.3.pdf. 
 
 It is built on top of Brandon Heller's Ripl library and POX controller with minor changes to both to support version consistency and Hedera functionality.
 
-Use CS 244 Mininet VM (from website or Amazon EC2).
+Use a CS 244 Mininet VM to run the code (either from the class website or an Amazon EC2 instance).
 
 (assert $HOME == '/home/mininet')
 
 1. Switch to the CS 244 version of Mininet
-    $ cd ~/mininet
-    $ git checkout -b cs244 origin/class/cs244
+
+    `$ cd ~/mininet`
+
+    `$ git checkout -b cs244 origin/class/cs244`
 
 2. Fix the module dependencies for this version
-    $ vim ~/mininet/mininet/moduledeps.py
-    (change this line: "-OVS_KMOD = 'openvswitch_mod'"
-                   to: "OVS_KMOD = 'openvswitch'")
+
+    `$ vim ~/mininet/mininet/moduledeps.py`
+
+    (^change this line: "-OVS_KMOD = 'openvswitch_mod'"
+                    to: "OVS_KMOD = 'openvswitch'")
 
 3. Install the correct version
-    $ cd ~/mininet
-    $ sudo make install
+
+    `$ cd ~/mininet`
+
+    `$ sudo make install`
 
 4. Switch to the 'dart' branch of POX
-    $ cd ~/pox
-    $ git checkout dart
-    $ git pull origin dart
+
+    `$ cd ~/pox`
+
+    `$ git checkout dart`
+
+    `$ git pull origin dart`
 
 5. Clone our project repo
-    $ cd ~
-    $ git clone https://github.com/iwalsh/244proj.git
-    $ sudo python setup.py install
+
+    `$ cd ~`
+
+    `$ git clone https://github.com/iwalsh/244proj.git`
+
+    `$ sudo python setup.py install`
 
 6. Run it!
-    $ cd ~/244proj
-    (Terminal #1 - start the remote controller using ECMP flow scheduling)
-        $ ~/pox/pox.py riplpox.riplpox --topo=ft,4 --routing=random --mode=reactive
-    (Terminal #2 - run our measurement script on a sample traffic pattern)
-        $ sudo python hedera.py ecmp traffic/stride2.json
 
-    (Alternate Terminal #1 - start the Hedera controller using Global First-Fit flow scheduling)
+    `$ cd ~/244proj`
+
+    Terminal #1 - start the remote controller using ECMP flow scheduling
+
+    `$ ~/pox/pox.py riplpox.riplpox --topo=ft,4 --routing=random --mode=reactive`
+
+    Terminal #2 - run our measurement script on a sample traffic pattern
+
+    `$ sudo python hedera.py ecmp traffic/stride2.json`
+
+    Alternate Terminal #1 - start the Hedera controller using Global First-Fit flow scheduling
+
+    `~/pox/pox.py controllers.hederaController --topo=ft,4`
 
 7. Plot the results
-    $ cd ~/244proj
-    $ python plot_results myAwesomePlot.png
+
+    `$ cd ~/244proj`
+
+    `$ python plot_results myAwesomePlot.png`
