@@ -11,9 +11,9 @@ from random import choice
 import logging
 lg = logging.getLogger('ripl.routing')
 
-DEBUG = True
+DEBUG = False
 
-lg.setLevel(logging.DEBUG)
+lg.setLevel(logging.INFO)
 if DEBUG:
     lg.setLevel(logging.DEBUG)
     lg.addHandler(logging.StreamHandler())

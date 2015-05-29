@@ -7,8 +7,6 @@ It is built on top of Brandon Heller's Ripl library and POX controller with mino
 
 Use a CS 244 Mininet VM to run the code (either from the class website or an Amazon EC2 instance).
 
-(assert $HOME == '/home/mininet')
-
 1. Switch to the CS 244 version of Mininet
 
     `$ cd ~/mininet`
@@ -42,26 +40,37 @@ Use a CS 244 Mininet VM to run the code (either from the class website or an Ama
 
     `$ git clone https://github.com/iwalsh/244proj.git`
 
+    `cd 244proj/`
+
     `$ sudo python setup.py install`
 
 6. Run it!
 
     `$ cd ~/244proj`
 
-    Terminal #1 - start the remote controller using ECMP flow scheduling
-
-    `$ ~/pox/pox.py riplpox.riplpox --topo=ft,4 --routing=random --mode=reactive`
-
-    Terminal #2 - run our measurement script on a sample traffic pattern
-
-    `$ sudo python hedera.py ecmp traffic/stride2.json`
-
-    Alternate Terminal #1 - start the Hedera controller using Global First-Fit flow scheduling
-
-    `~/pox/pox.py controllers.hederaController --topo=ft,4`
+    `$ sudo python measure_all_the_things.py`
 
 7. Plot the results
 
     `$ cd ~/244proj`
 
     `$ python plot_results myAwesomePlot.png`
+
+BONUS:
+
+If you don't want to run the full measurement suite, you can run one measurement
+at a time, like so:
+
+`$ cd ~/244proj`
+
+Terminal #1 - start the remote controller using ECMP flow scheduling
+
+`$ ~/pox/pox.py riplpox.riplpox --topo=ft,4 --routing=random --mode=reactive`
+
+Terminal #2 - run our measurement script on a sample traffic pattern
+
+`$ sudo python hedera.py ecmp traffic/stride2.json`
+
+Alternate Terminal #1 - start the Hedera controller using Global First-Fit flow scheduling
+
+`~/pox/pox.py controllers.hederaController --topo=ft,4`
