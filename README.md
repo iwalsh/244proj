@@ -48,7 +48,7 @@ Use a CS 244 Mininet VM to run the code (either from the class website or an Ama
 
     `$ cd ~/244proj`
 
-    `$ sudo python measure_all_the_things.py`
+    `$ sudo ./run.sh`
 
 7. Plot the results
 
