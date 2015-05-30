@@ -208,7 +208,7 @@ def main(args):
 
     start = time()
     topo = FatTreeTopo(k=4, speed=1.0)  # 1.0 Gbps links
-    net = Mininet(topo=topo, controller=None)
+    net = Mininet(topo=topo)
     net.addController(name='hederaController', controller=RemoteController,
                       ip='127.0.0.1', port=6633)
     net.start()
