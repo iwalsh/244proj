@@ -65,7 +65,7 @@ at a time, like so:
 
 Terminal #1 - start the remote controller using ECMP flow scheduling
 
-`$ ~/pox/pox.py riplpox.riplpox --topo=ft,4 --routing=random --mode=reactive`
+`$ ~/pox/pox.py controllers.riplpox --topo=ft,4 --routing=hashed --mode=reactive`
 
 Terminal #2 - run our measurement script on a sample traffic pattern
 
