@@ -2,8 +2,8 @@
 
 from mininet.util import makeNumeric
 
-from ripl.routing import STStructuredRouting, RandomStructuredRouting
-from ripl.routing import HashedStructuredRouting
+from ripllib.routing import STStructuredRouting, RandomStructuredRouting
+from ripllib.routing import HashedStructuredRouting
 
 
 # TODO: this code is duplicated from mininet/bin/mn, except for TOPOS/topos.
