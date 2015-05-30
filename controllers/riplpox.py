@@ -21,6 +21,7 @@ from ripl.mn import topos
 from util import buildTopo, getRouting
 
 log = core.getLogger()
+log.setLevel(logging.WARNING)
 
 # Number of bytes to send for packet_ins
 MISS_SEND_LEN = 2000
