@@ -203,7 +203,7 @@ class HederaController(object):
         route = self._global_first_fit(flow_key, path_key, flow_demand, packet)
       else:
         hash_ = self._ecmp_hash(packet)
-        route = self.r.get_route(src_sw_name, dst_sw_name, hash_, False)
+        route = self.r.get_route(in_name, out_name, hash_, False)
 
       log.info("route: %s" % route)
       match = of.ofp_match.from_packet(packet)
