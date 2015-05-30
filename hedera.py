@@ -3,7 +3,7 @@
 # Reproducing the results of the Hedera paper.
 #
 # Running the POX controller:
-# $ ~/pox/pox.py riplpox.riplpox --topo=ft,4 --routing=random --mode=reactive
+# $ ~/pox/pox.py controllers.riplpox --topo=ft,4 --routing=hashed --mode=reactive
 #
 # Running Mininet via this script (second terminal window)
 # $ sudo python hedera.py ecmp traffic/stride1.json
@@ -28,7 +28,7 @@ from mininet.log import lg
 from mininet.util import dumpNodeConnections
 from mininet.cli import CLI
 
-from ripl.dctopo import FatTreeTopo
+from ripllib.dctopo import FatTreeTopo
 
 from argparse import ArgumentParser
 

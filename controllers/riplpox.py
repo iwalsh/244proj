@@ -16,7 +16,7 @@ from pox.lib.packet.ipv4 import ipv4
 from pox.lib.packet.udp import udp
 from pox.lib.packet.tcp import tcp
 
-from ripl.mn import topos
+from ripllib.mn import topos
 
 from util import buildTopo, getRouting
 
