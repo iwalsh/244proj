@@ -13,7 +13,7 @@ lg = logging.getLogger('ripl.routing')
 
 DEBUG = False
 
-lg.setLevel(logging.INFO)
+lg.setLevel(logging.WARNING)
 if DEBUG:
     lg.setLevel(logging.DEBUG)
     lg.addHandler(logging.StreamHandler())
